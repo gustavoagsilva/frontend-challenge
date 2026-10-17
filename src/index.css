@@ -406,3 +406,4 @@ dialog::backdrop { background: #080503b8; }
  .receipt-meta { grid-template-columns:1fr; gap:6px; }
  .receipt-meta dd { text-align:left; margin-bottom:8px; color:#d6b58b; }
 }
+.product-title .favorite-button { position:static; flex-shrink:0; } .connection-status { padding:10px 20px; background:#49301d; color:#ffe0b3; text-align:center; font-size:11px; }

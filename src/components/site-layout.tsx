@@ -12,7 +12,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [feature, setFeature] = useState('')
   function notice(name: string) {
-    const paths: Record<string, string> = { Carrinho: '/carrinho', Favoritos: '/favoritos', Perfil: '/perfil', 'Meu cadastro': '/perfil', Carteiras: '/carteiras', 'Hist?rico de pedidos': '/pedidos' }
+    const paths: Record<string, string> = { Carrinho: '/carrinho', Favoritos: '/favoritos', Perfil: '/perfil', 'Meu cadastro': '/perfil', Carteiras: '/carteiras', 'Histórico de pedidos': '/pedidos' }
     if (name === 'Entrar') { void navigate({ to: '/login', search: { redirect: location.pathname + location.search } }); return }
     if (paths[name]) { void navigate({ href: paths[name] }); return }
     setFeature(name); dialog.current?.showModal()

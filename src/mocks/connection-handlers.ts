@@ -14,7 +14,11 @@ export const connectionHandlers = [
     const failure = await network(request);
     if (failure) return failure;
     try {
-      const input = await body<{ walletId: string; provider: string }>(request);
+      const input = await body<{
+        walletId: string;
+        provider: string;
+        network: string;
+      }>(request);
       return await transaction((db) => {
         const session = requireUser(db, request);
         const wallet = db.wallets[session.user.id]?.find(
@@ -33,7 +37,7 @@ export const connectionHandlers = [
             400,
             "Conexão recusada na carteira. Tente novamente quando estiver pronto.",
           );
-        if (scenario() === "wrong-network")
+        if (scenario() === "wrong-network" || input.network !== wallet.network)
           throw new ApiFault(
             409,
             "Rede incompatível. Selecione a rede cadastrada da carteira.",

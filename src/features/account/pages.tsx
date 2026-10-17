@@ -1,3 +1,4 @@
+import { walletQuery } from './api'
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,11 +9,6 @@ import { http, apiError } from "@/lib/http";
 import type { Profile, Session, Wallet } from "@/domain/models";
 import { changeSession, useSession } from "./session";
 import { defaultSearch, networks } from "@/features/catalog/contracts";
-export const walletQuery = (userId: string) => ({
-  queryKey: ["private", userId, "wallets"],
-  queryFn: async ({ signal }: { signal: AbortSignal }) =>
-    (await http.get<Wallet[]>("/wallets", { signal })).data,
-});
 export function AccountSidebar() {
   const navigate = useNavigate();
   const logout = useMutation({

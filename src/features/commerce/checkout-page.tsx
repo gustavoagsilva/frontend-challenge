@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Message } from "@/components/form";
 import { http, apiError } from "@/lib/http";
 import { useSession } from "@/features/account/session";
-import { walletQuery } from "@/features/account/pages";
+import { walletQuery } from "@/features/account/api";
 import type { Collector, Order, Quote, Wallet } from "@/domain/models";
 import { useCart, useQuote } from "./api";
 import { LineSummary, SummarySkeleton, Totals } from "./shared";
@@ -78,8 +78,17 @@ function Checkout({
     wallets.data?.find((w) => w.id === walletId) ||
     wallets.data?.find((w) => w.primary) ||
     wallets.data?.[0];
+  const [networkChoice, setNetworkChoice] = useState({
+    walletId: "",
+    network: "",
+  });
+  const selectedNetwork =
+    networkChoice.walletId === wallet?.id
+      ? networkChoice.network
+      : wallet?.network || "Ethereum";
   const [connection, setConnection] = useState("");
-  const connectionKey = (wallet?.id || "") + ":" + provider;
+  const connectionKey =
+    (wallet?.id || "") + ":" + provider + ":" + selectedNetwork;
   const connected = connection === connectionKey;
   const [review, setReview] = useState<{ quote: Quote; data: string } | null>(
     null,
@@ -98,6 +107,7 @@ function Checkout({
     collector,
     walletId: wallet?.id,
     provider,
+    network: selectedNetwork,
   });
   const validReview =
     !!review &&
@@ -118,6 +128,7 @@ function Checkout({
         await http.post("/wallet-connection", {
           walletId: wallet?.id,
           provider,
+          network: selectedNetwork,
         })
       ).data,
     onSuccess: () => {
@@ -334,6 +345,24 @@ function Checkout({
                 ))}
               </fieldset>
             )}
+            <label className="form-field">
+              <span>Rede da conexão</span>
+              <select
+                value={selectedNetwork}
+                onChange={(event) => {
+                  setNetworkChoice({
+                    walletId: wallet?.id || "",
+                    network: event.target.value,
+                  });
+                  setConnection("");
+                  setReview(null);
+                }}
+              >
+                {["Ethereum", "Polygon", "Solana"].map((network) => (
+                  <option key={network}>{network}</option>
+                ))}
+              </select>
+            </label>
             <fieldset className="provider-options">
               <legend>Conectar usando</legend>
               {["WalletConnect", "MetaMask", "Coinbase Wallet"].map((item) => (

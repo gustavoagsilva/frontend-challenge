@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useNotice } from '@/components/notice-context'
 import { catalogQuery, discoveryQuery } from './api'
-import { collections, networks, defaultSearch, formatEth, type CatalogSearch, type Nft } from './contracts'
+import { collections, networks, defaultSearch, ethUnits, formatEth, type CatalogSearch, type Nft } from './contracts'
 
 export function NftImage({ nft, eager = false }: { nft: Nft; eager?: boolean }) {
   return <img src={nft.image} alt={nft.name + ', ilustração de colecionável digital'} width="600" height="600" loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : 'auto'} />
@@ -46,7 +46,7 @@ export function HomePage() {
   function submit(event: FormEvent) { event.preventDefault(); update({ q: query.trim() }) }
   function applyPrice(event: FormEvent) {
     event.preventDefault()
-    if (price.min && price.max && Number(price.min) > Number(price.max)) { setPriceError('O preço mínimo deve ser menor ou igual ao máximo.'); return }
+    if (price.min && price.max && ethUnits(price.min) > ethUnits(price.max)) { setPriceError('O preço mínimo deve ser menor ou igual ao máximo.'); return }
     setPriceError(''); update(price)
   }
   const featured = discovery.data?.featured[slide]

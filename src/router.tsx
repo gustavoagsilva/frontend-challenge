@@ -1,3 +1,5 @@
+import { DemoPage } from './features/demo/page'
+import { Realtime } from './features/commerce/realtime'
 import {
   createRootRoute,
   createRoute,
@@ -21,7 +23,7 @@ import { OrderPage, OrdersPage } from "./features/commerce/orders-page";
 const root = createRootRoute({
   component: () => (
     <>
-      <SessionEffects />
+      <SessionEffects /><Realtime />
       <SiteLayout>
         <Outlet />
       </SiteLayout>
@@ -115,6 +117,7 @@ export const orderRoute = createRoute({
   beforeLoad: requireAuth,
   component: OrderPage,
 });
+const demo = createRoute({getParentRoute:()=>root,path:'/demonstracao',component:DemoPage});
 export const router = createRouter({
   routeTree: root.addChildren([
     homeRoute,
@@ -127,7 +130,7 @@ export const router = createRouter({
     cart,
     orders,
     checkout,
-    orderRoute,
+    orderRoute, demo,
   ]),
   scrollRestoration: true,
 });

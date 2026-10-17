@@ -1,6 +1,6 @@
 import type { Cart, Collector, Order, Quote } from "@/domain/models";
 import { decimal, multiply, units } from "@/domain/money";
-import { cartFor, transaction, type Database } from "./database";
+import { cartFor, database, transaction, type Database } from "./database";
 import { ApiFault, emailValid } from "./network";
 import { publish } from "./events";
 
@@ -114,6 +114,17 @@ export function settle(db: Database, order: Order, force = false) {
   return true;
 }
 export function announceOrder(order: Order) {
+  void database().then((db) => {
+    for (const line of order.quote.lines) {
+      const p = db.products.find((p) => p.id === line.nftId);
+      if (p)
+        publish("nft.updated", {
+          id: p.id + ":" + p.version,
+          resourceId: p.id,
+          version: p.version,
+        });
+    }
+  });
   publish("order.updated", {
     id: order.id + ":" + order.version,
     resourceId: order.id,

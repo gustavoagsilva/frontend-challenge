@@ -232,6 +232,7 @@ export const commerceHandlers = [
         );
       }
       if (!result.order) throw new ApiFault(409, "Revise o pedido.");
+      if (result.created) announceOrder(result.order);
       scheduleOrder(result.order);
       if (result.created && scenario() === "order-timeout")
         return HttpResponse.json(
