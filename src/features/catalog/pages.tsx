@@ -1,9 +1,10 @@
+import { FavoriteButton } from '@/features/account/favorites'
 import { containDialogFocus } from '@/lib/dialog-focus'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Heart, Search, SlidersHorizontal, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
 import { homeRoute, detailRoute } from '@/router'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -11,13 +12,12 @@ import { useNotice } from '@/components/notice-context'
 import { catalogQuery, discoveryQuery, nftQuery } from './api'
 import { collections, networks, defaultSearch, formatEth, type CatalogSearch, type Nft } from './contracts'
 
-function NftImage({ nft, eager = false }: { nft: Nft; eager?: boolean }) {
+export function NftImage({ nft, eager = false }: { nft: Nft; eager?: boolean }) {
   return <img src={nft.image} alt={nft.name + ', ilustração de colecionável digital'} width="600" height="600" loading={eager ? 'eager' : 'lazy'} fetchPriority={eager ? 'high' : 'auto'} />
 }
-function NftCard({ nft }: { nft: Nft }) {
-  const notice = useNotice()
+export function NftCard({ nft }: { nft: Nft }) {
   return <article className="nft-card" data-testid="nft-card">
-    <div className="nft-art"><Link to="/nfts/$nftId" params={{ nftId: nft.id }} aria-label={'Ver ' + nft.name}><NftImage nft={nft} /></Link>{nft.badge && <span className="badge">{nft.badge}</span>}<button className="favorite-button" aria-label={'Favoritar ' + nft.name} onClick={() => notice('Favoritos · autenticação necessária')}><Heart size={17} /></button></div>
+    <div className="nft-art"><Link to="/nfts/$nftId" params={{ nftId: nft.id }} aria-label={'Ver ' + nft.name}><NftImage nft={nft} /></Link>{nft.badge && <span className="badge">{nft.badge}</span>}<FavoriteButton id={nft.id} /></div>
     <div className="card-caption"><Link to="/nfts/$nftId" params={{ nftId: nft.id }}>{nft.name}</Link><strong>{formatEth(nft.price)}</strong><span>{nft.network} <span aria-hidden="true">·</span> Edição {nft.edition}</span></div>
   </article>
 }

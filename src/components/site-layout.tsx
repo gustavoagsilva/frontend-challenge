@@ -1,20 +1,28 @@
+import { useSession } from '@/features/account/session'
 import { defaultSearch } from '@/features/catalog/contracts'
 import { useRef, useState, type ReactNode } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Bell, ChevronRight, Heart, House, Camera, LogIn, Search, ShieldCheck, ShoppingCart, UserRound, Wallet, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { NoticeContext } from './notice-context'
 import { containDialogFocus } from '@/lib/dialog-focus'
 export function SiteLayout({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
+  const session = useSession()
   const dialog = useRef<HTMLDialogElement>(null)
   const [feature, setFeature] = useState('')
-  function notice(name: string) { setFeature(name); dialog.current?.showModal() }
+  function notice(name: string) {
+    const paths: Record<string, string> = { Carrinho: '/carrinho', Favoritos: '/favoritos', Perfil: '/perfil', 'Meu cadastro': '/perfil', Carteiras: '/carteiras', 'Hist?rico de pedidos': '/pedidos' }
+    if (name === 'Entrar') { void navigate({ to: '/login', search: { redirect: location.pathname + location.search } }); return }
+    if (paths[name]) { void navigate({ href: paths[name] }); return }
+    setFeature(name); dialog.current?.showModal()
+  }
   return <NoticeContext.Provider value={notice}>
     <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
     <header className="container site-header">
       <Link to="/" search={defaultSearch} className="wordmark" aria-label="Kurio início">KURIO<span>®</span></Link>
       <nav aria-label="Navegação principal"><Link to="/" search={defaultSearch} activeProps={{ className: 'active' }} activeOptions={{ exact: true }}>Início</Link><a href="/#catalog">Mercado</a><button onClick={() => notice('Criadores')}>Criadores</button><button onClick={() => notice('Suporte')}>Suporte</button></nav>
-      <div className="header-actions"><a className="icon-button" href="/#catalog-search" aria-label="Buscar NFTs"><Search size={18} /></a><button className="icon-button" aria-label="Carrinho" onClick={() => notice('Carrinho')}><ShoppingCart size={18} /><span className="cart-dot" /></button><Button size="sm" onClick={() => notice('Entrar')}><LogIn />Entrar</Button></div>
+      <div className="header-actions"><a className="icon-button" href="/#catalog-search" aria-label="Buscar NFTs"><Search size={18} /></a><button className="icon-button" aria-label="Carrinho" onClick={() => notice('Carrinho')}><ShoppingCart size={18} /><span className="cart-dot" /></button><Button size="sm" onClick={() => notice(session.data ? 'Perfil' : 'Entrar')}><LogIn />{session.data ? session.data.user.name.split(' ')[0] : 'Entrar'}</Button></div>
     </header>
     {children}
     <footer className="container site-footer">

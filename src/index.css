@@ -226,3 +226,66 @@ dialog::backdrop { background: #080503b8; }
  .detail-grid h1 { font-size: 25px; }
 }
 @media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Account and transaction screens share the same form controls. */
+.form-field { display:flex; flex-direction:column; gap:8px; margin:18px 0; font-size:12px; }
+.form-field input, .form-field select, .form-field textarea, .collector-form textarea { width:100%; min-width:0; border:1px solid #65442e; border-radius:4px; background:#1b110d; color:#f1e9dd; min-height:42px; padding:11px 12px; }
+.form-field input[aria-invalid=true] { border-color:#f4a18e; }
+.form-field input[type=file] { font-size:11px; }
+.form-field input::file-selector-button { background:#d28c4a; color:#140d0a; border:0; border-radius:3px; padding:6px; margin-right:8px; cursor:pointer; }
+.form-message { color:#d9d9b6; background:#2d3221; padding:12px; margin:16px 0; line-height:1.7; border-radius:4px; font-size:12px; }
+.form-message.error { color:#ffc4b9; background:#3f231e; }
+.form-columns { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.button-row { display:flex; gap:12px; flex-wrap:wrap; }
+.check-field { display:flex; align-items:center; gap:10px; margin:20px 0; }
+.account-layout { display:grid; grid-template-columns:245px minmax(0,1fr); gap:48px; padding-block:38px; min-height:680px; }
+.account-layout h1 { font-size:22px; font-weight:500; margin-bottom:24px; }
+.account-layout h2 { font-size:15px; font-weight:500; margin-bottom:14px; }
+.account-sidebar { align-self:start; display:flex; flex-direction:column; background:#251812; padding:22px; gap:18px; }
+.account-sidebar a, .account-sidebar > button { text-align:left; color:#e0b17d; font-size:12px; }
+.account-sidebar a[data-status=active] { color:#f8d9aa; border-left:2px solid #d28c4a; padding-left:10px; }
+.account-form { max-width:640px; }
+.password-form { max-width:400px; margin-top:48px; }
+.avatar-row { display:flex; gap:20px; align-items:center; margin-bottom:24px; }
+.avatar-row img, .avatar-placeholder { width:64px; height:64px; flex-shrink:0; border-radius:100%; object-fit:cover; }
+.avatar-placeholder { display:grid; place-items:center; background:#3d291a; font-size:30px; color:#d28c4a; }
+.wallet-list { margin-top:28px; }
+.wallet-card { display:flex; justify-content:space-between; gap:20px; padding:20px; background:#281a13; margin-bottom:14px; border-radius:7px; }
+.wallet-card p { font-size:11px; color:#d8b98b; word-break:break-all; }
+.wallet-card span { color:#c3a580; font-size:11px; }
+.inline-badge { display:inline-block; padding:3px 8px; border:1px solid #67472d; border-radius:20px; font-size:10px !important; }
+.auth-page { position:relative; min-height:1000px; padding-block:40px; }
+.auth-backdrop { display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+.auth-backdrop h1 { font-size:36px; line-height:1.6; margin-top:24px; }
+.auth-backdrop > img { width:360px; justify-self:end; border-radius:10px; }
+.auth-grid { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+.auth-grid img { width:100%; border-radius:8px; }
+.auth-panel { position:absolute; top:80px; left:50%; transform:translateX(-50%); padding:40px; width:420px; max-width:100%; background:#281a13; box-shadow:0 18px 80px #0009; border-bottom:3px solid #d28c4a; }
+.auth-panel h1 { text-align:center; font-size:17px; margin-bottom:12px; font-weight:500; }
+.auth-panel > p.muted { text-align:center; font-size:10px; }
+.auth-tabs { display:flex; justify-content:center; gap:14px; margin-bottom:30px; }
+.auth-tabs a { font-size:12px; }
+.auth-tabs .selected { color:#efa253; }
+.auth-close { position:absolute; right:12px; top:12px; }
+.auth-brand { text-align:center; letter-spacing:3px; font-size:26px; font-weight:600; margin:14px 0 30px; display:none; }
+.password-toggle { font-size:10px; display:flex; margin-left:auto; }
+.auth-switch { text-align:center; margin-top:26px; font-size:11px; color:#ccb18b; }
+.auth-switch a { color:#f4b574; }
+.is-favorite { color:#f5ac68; }
+@media(max-width:700px) {
+ .account-layout { grid-template-columns:1fr; gap:28px; padding-top:24px; }
+ .account-sidebar { flex-direction:row; flex-wrap:wrap; gap:14px 20px; padding:18px; }
+ .account-sidebar h2 { width:100%; margin:0; }
+ .account-sidebar a, .account-sidebar > button { font-size:11px; min-height:28px; display:flex; align-items:center; }
+ .form-columns { grid-template-columns:1fr; gap:0; }
+ .wallet-card { padding:16px; flex-direction:column; }
+ .auth-page { min-height:750px; padding-block:20px; }
+ .auth-backdrop { display:none; }
+ .auth-panel { position:relative; inset:auto; transform:none; width:100%; padding:20px 8px 40px; box-shadow:none; border:0; background:none; }
+ .auth-brand { display:block; margin:30px 0 54px; }
+ .auth-tabs { display:none; }
+ .auth-panel h1 { margin-bottom:30px; }
+ .auth-panel > p.muted { display:none; }
+ .auth-page ~ .site-footer { display:none; }
+ .auth-switch { margin-top:36px; }
+}

@@ -1,6 +1,7 @@
 import { http, HttpResponse, delay } from 'msw'
 import { collections, ethUnits, validateSearch } from '@/features/catalog/contracts'
-import { nfts } from './fixtures'
+import { database, resetDatabase } from './database'
+import { accountHandlers } from './account-handlers'
 // Scenario selection is restricted to the mock layer. No fake data enters UI/hooks.
 async function condition(request: Request) {
   const scenario = localStorage.getItem('kurio:scenario') || 'success'
@@ -11,12 +12,15 @@ async function condition(request: Request) {
   return null
 }
 export const handlers = [
+  ...accountHandlers,
   http.get('/api/discovery', async ({ request }) => {
     const failure = await condition(request); if (failure) return failure
+    const { products: nfts } = await database()
     return HttpResponse.json({ featured: nfts.slice(0, 3), collections: collections.map(name => ({ name, count: nfts.filter(n => n.collection === name).length })) })
   }),
   http.get('/api/nfts', async ({ request }) => {
     const failure = await condition(request); if (failure) return failure
+    const { products: nfts } = await database()
     const search = validateSearch(Object.fromEntries(new URL(request.url).searchParams))
     let items = localStorage.getItem('kurio:scenario') === 'empty' ? [] : nfts.filter(n =>
       (!search.q || `${n.name} ${n.collection}`.toLowerCase().includes(search.q.toLowerCase())) &&
@@ -29,8 +33,9 @@ export const handlers = [
   }),
   http.get('/api/nfts/:id', async ({ request, params }) => {
     const failure = await condition(request); if (failure) return failure
+    const { products: nfts } = await database()
     const nft = nfts.find(n => n.id === params.id)
     return nft ? HttpResponse.json(nft) : HttpResponse.json({ message: 'NFT não encontrado.' }, { status: 404 })
   }),
-  http.post('/api/__mock/reset', () => { localStorage.removeItem('kurio:scenario'); return HttpResponse.json({ reset: true }) }),
+  http.post('/api/__mock/reset', async () => { await resetDatabase(); localStorage.removeItem('kurio:scenario'); return HttpResponse.json({ reset: true }) }),
 ]
