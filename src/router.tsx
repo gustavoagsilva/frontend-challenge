@@ -6,7 +6,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { validateSearch } from "./features/catalog/contracts";
-import { HomePage, DetailPage } from "./features/catalog/pages";
+import { HomePage } from "./features/catalog/pages";
 import { SiteLayout } from "./components/site-layout";
 import { AuthPage } from "./features/account/auth-page";
 import { ProfilePage, WalletsPage } from "./features/account/pages";
@@ -14,6 +14,10 @@ import { FavoritesPage } from "./features/account/favorites";
 import { SessionEffects } from "./features/account/session-effects";
 import { queryClient } from "./lib/query-client";
 import { sessionQuery, safeReturn } from "./features/account/session";
+import { DetailPage } from "./features/commerce/detail-page";
+import { CartPage } from "./features/commerce/cart-page";
+import { CheckoutPage } from "./features/commerce/checkout-page";
+import { OrderPage, OrdersPage } from "./features/commerce/orders-page";
 const root = createRootRoute({
   component: () => (
     <>
@@ -91,23 +95,25 @@ const favorites = createRoute({
 const cart = createRoute({
   getParentRoute: () => root,
   path: "/carrinho",
-  component: () => (
-    <main className="container empty-state">
-      <h1>Carrinho</h1>
-      <p>Em implementação.</p>
-    </main>
-  ),
+  component: CartPage,
+});
+const checkout = createRoute({
+  getParentRoute: () => root,
+  path: "/pagamento",
+  beforeLoad: requireAuth,
+  component: CheckoutPage,
 });
 const orders = createRoute({
   getParentRoute: () => root,
   path: "/pedidos",
   beforeLoad: requireAuth,
-  component: () => (
-    <main className="container empty-state">
-      <h1>Meus pedidos</h1>
-      <p>Em implementação.</p>
-    </main>
-  ),
+  component: OrdersPage,
+});
+export const orderRoute = createRoute({
+  getParentRoute: () => root,
+  path: "/pedidos/$orderId",
+  beforeLoad: requireAuth,
+  component: OrderPage,
 });
 export const router = createRouter({
   routeTree: root.addChildren([
@@ -120,6 +126,8 @@ export const router = createRouter({
     favorites,
     cart,
     orders,
+    checkout,
+    orderRoute,
   ]),
   scrollRestoration: true,
 });

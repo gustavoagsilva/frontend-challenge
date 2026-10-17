@@ -12,6 +12,7 @@ import type {
 type UserRecord = Profile & { passwordHash: string; salt: string };
 type StoredCart = { items: CartItem[]; coupon: string; version: number };
 export type Database = {
+  connections: Record<string, { walletId: string; provider: string }>;
   users: UserRecord[];
   sessions: Record<string, { userId: string; expiresAt: number }>;
   products: Product[];
@@ -92,6 +93,7 @@ async function seed(): Promise<Database> {
   return {
     users,
     sessions: {},
+    connections: {},
     products: nfts.map((n) => ({
       ...n,
       description:
@@ -124,7 +126,12 @@ async function seed(): Promise<Database> {
 }
 export async function database() {
   const saved = localStorage.getItem(KEY);
-  if (saved) return JSON.parse(saved) as Database;
+  if (saved) {
+    const db = JSON.parse(saved) as Database;
+    db.quotes ??= {};
+    db.connections ??= {};
+    return db;
+  }
   seedPromise ??= seed();
   const db = await seedPromise;
   localStorage.setItem(KEY, JSON.stringify(db));

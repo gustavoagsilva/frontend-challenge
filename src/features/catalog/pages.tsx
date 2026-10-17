@@ -3,13 +3,13 @@ import { containDialogFocus } from '@/lib/dialog-focus'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { isAxiosError } from 'axios'
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
-import { homeRoute, detailRoute } from '@/router'
+
+import { ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
+import { homeRoute } from '@/router'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useNotice } from '@/components/notice-context'
-import { catalogQuery, discoveryQuery, nftQuery } from './api'
+import { catalogQuery, discoveryQuery } from './api'
 import { collections, networks, defaultSearch, formatEth, type CatalogSearch, type Nft } from './contracts'
 
 export function NftImage({ nft, eager = false }: { nft: Nft; eager?: boolean }) {
@@ -78,10 +78,4 @@ export function HomePage() {
     <section className="journal" aria-labelledby="journal-title"><h2 id="journal-title">Diário da Cunhagem</h2><p>Histórias, guias e inspirações para colecionadores e criadores da nova cultura digital.</p><div className="journal-grid">{['Como funciona a propriedade da arte digital?', 'Os artistas digitais que estamos acompanhando', 'Edições, criadores e possibilidades', 'Como proteger seus colecionáveis'].map((title, i) => <article key={title}>{discovery.data?.featured[i % 3] && <NftImage nft={discovery.data.featured[i % 3]} />}<div><span>ARTE & CULTURA · LEITURA</span><h3>{title}</h3><p>Um novo olhar para a criatividade e para o universo dos colecionáveis.</p><button className="text-link" onClick={() => notice('Conteúdo editorial')}>Saiba mais <ArrowRight size={13} /></button></div></article>)}</div></section>
     <dialog onKeyDown={containDialogFocus} ref={filters} className="filter-dialog" aria-label="Filtros do catálogo"><div className="dialog-heading"><h2>Refinar sua busca</h2><Button variant="ghost" size="icon" aria-label="Fechar filtros" onClick={() => filters.current?.close()}><X /></Button></div>{filterContent}<Button className="w-full mt-6" onClick={() => filters.current?.close()}>Ver resultados</Button></dialog>
   </main>
-}
-export function DetailPage() {
-  const { nftId } = detailRoute.useParams()
-  const nft = useQuery(nftQuery(nftId))
-  const notice = useNotice()
-  return <main id="main-content" className="container detail-page"><Link to="/" search={defaultSearch} className="text-link"><ArrowLeft size={16} /> Voltar ao catálogo</Link>{nft.isPending ? <CatalogSkeleton /> : nft.isError ? isAxiosError(nft.error) && nft.error.response?.status === 404 ? <div className="empty-state"><h1>NFT não encontrado</h1><p>Este colecionável não está disponível no catálogo.</p></div> : <ErrorState retry={() => nft.refetch()} /> : <div className="detail-grid"><NftImage nft={nft.data} eager /><div><p className="eyebrow">{nft.data.collection}</p><h1>{nft.data.name}</h1><strong className="detail-price">{formatEth(nft.data.price)}</strong><p>Um colecionável digital da coleção {nft.data.collection}.</p><dl><dt>Rede</dt><dd>{nft.data.network}</dd><dt>Edição</dt><dd>{nft.data.edition}</dd><dt>Disponibilidade</dt><dd>{nft.data.available ? nft.data.available + ' unidades' : 'Esgotado'}</dd></dl><Button disabled={!nft.data.available} onClick={() => notice('Compra')}>{nft.data.available ? 'Comprar NFT' : 'Esgotado'}</Button><p className="muted mt-4">A compra será disponibilizada em uma próxima etapa.</p></div></div>}</main>
 }
