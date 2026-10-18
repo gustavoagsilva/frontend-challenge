@@ -1,4 +1,5 @@
 import { FavoriteButton } from "@/features/account/favorite-button";
+import { nftArtwork } from "@/lib/nft-artwork";
 import { containDialogFocus } from "@/lib/dialog-focus";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -518,9 +519,24 @@ export function HomePage() {
             "Como proteger seus colecionáveis",
           ].map((title, i) => (
             <article key={title}>
-              {discovery.data?.featured[i % 3] && (
-                <NftImage nft={discovery.data.featured[i % 3]} />
-              )}
+              <img
+                src={
+                  [
+                    nftArtwork.ivory,
+                    nftArtwork.emerald,
+                    nftArtwork.nomad,
+                    nftArtwork.golden,
+                  ][i]
+                }
+                alt={
+                  ["Ivory Baron", "Emerald Ape", "Violet Nomad", "Golden Beat"][
+                    i
+                  ]
+                }
+                width="250"
+                height="250"
+                loading="lazy"
+              />
               <div>
                 <span>ARTE & CULTURA · LEITURA</span>
                 <h3>{title}</h3>

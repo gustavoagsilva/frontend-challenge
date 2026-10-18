@@ -44,14 +44,14 @@ Não há servidor Socket.IO externo nem fallback de long polling. Os eventos sim
 
 ## Visual e acessibilidade
 
-Implementação baseada nos prints recebidos. Fundo #140d0a, tons cobre, fonte IBM Plex Mono local e imagens SVG provisórias. A fonte e as ilustrações são substituições documentadas; não foi possível conferir todas as medidas e assets originais diretamente no arquivo Figma.
+Implementação baseada nos prints recebidos. Fundo #140d0a, tons cobre, fonte IBM Plex Mono local e quatro artes PNG originais exportadas do Figma e fornecidas pelo responsável. A fonte permanece uma substituição; não foi possível conferir todas as medidas diretamente no arquivo Figma. A atualização das URLs antigas ocorre na camada de mocks, preservando contas, carrinhos e valores dos pedidos existentes.
 
 Desktop mantém catálogo com sidebar, hero, cards, promoções e rodapé. Mobile reorganiza filtros em diálogo, usa navegação inferior no catálogo e telas de compra sem rodapé. Detalhe mobile mantém a seleção de galeria em miniaturas sobre a imagem. Checkout apresenta dados obrigatórios em rolagem, mesmo quando não aparecem integralmente no frame mobile.
 
 Campos têm labels e erros associados; estados usam texto além de cor. Diálogos prendem foco e fecham com Escape. Skeletons respeitam movimento reduzido. Quantidades, conexão, mutations e alterações de preço fornecem feedback. A rota de autenticação tem painel sobre o fundo no desktop e formulário independente no mobile.
 
-Conteúdo editorial, redes sociais, recuperação de senha e login social não integram o fluxo exigido; ações auxiliares disponíveis informam sua indisponibilidade, sem fingir conclusão. A fidelidade final depende da troca das imagens provisórias e da revisão com os assets originais.
+Conteúdo editorial, redes sociais, recuperação de senha e login social não integram o fluxo exigido; ações auxiliares disponíveis informam sua indisponibilidade, sem fingir conclusão. As imagens já correspondem às quatro artes dos prints; medidas, tipografia e composição ainda podem ser refinadas na revisão visual.
 
 ## Próximos cuidados
 
-Publicar na Vercel somente após revisão do responsável; confirmar rotas e service worker na URL final. Substituir imagens e repetir baselines/auditorias. Os resultados de Lighthouse, inclusive valores abaixo da meta, estão registrados separadamente; não há caminho especial de renderização para auditoria.
+Publicar na Vercel somente após revisão do responsável; confirmar rotas e service worker na URL final. Repetir auditorias na versão com as artes originais. Os resultados anteriores de Lighthouse, inclusive valores abaixo da meta, estão registrados separadamente; não há caminho especial de renderização para auditoria.

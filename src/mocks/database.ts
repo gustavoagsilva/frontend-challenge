@@ -1,4 +1,5 @@
 import { nfts } from "./fixtures";
+import { originalArtwork } from "@/lib/nft-artwork";
 import type {
   CartItem,
   Order,
@@ -133,6 +134,14 @@ export async function database() {
     const db = JSON.parse(saved) as Database;
     db.quotes ??= {};
     db.connections ??= {};
+    // Upgrade artwork URLs without resetting users, carts or monetary snapshots.
+    for (const product of db.products)
+      product.image = originalArtwork(product.image);
+    for (const order of db.orders)
+      for (const line of order.quote.lines)
+        line.image = originalArtwork(line.image);
+    for (const { quote } of Object.values(db.quotes))
+      for (const line of quote.lines) line.image = originalArtwork(line.image);
     return db;
   }
   seedPromise ??= seed();

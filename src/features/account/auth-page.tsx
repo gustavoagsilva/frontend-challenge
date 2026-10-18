@@ -8,6 +8,7 @@ import { http, apiError } from "@/lib/http";
 import type { Session } from "@/domain/models";
 import { changeSession, safeReturn } from "./session";
 import { defaultSearch } from "@/features/catalog/contracts";
+import { catalogArtwork, nftArtwork } from "@/lib/nft-artwork";
 
 export function AuthPage({ register = false }: { register?: boolean }) {
   const search = useSearch({ strict: false }) as { redirect?: string };
@@ -50,16 +51,10 @@ export function AuthPage({ register = false }: { register?: boolean }) {
             DA ARTE DIGITAL.
           </h1>
         </div>
-        <img src="/images/nfts/sample-1.svg" alt="" width="600" height="600" />
+        <img src={nftArtwork.emerald} alt="" width="450" height="450" />
         <div className="auth-grid">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <img
-              key={i}
-              src={"/images/nfts/sample-" + i + ".svg"}
-              alt=""
-              width="600"
-              height="600"
-            />
+          {catalogArtwork.map((image, i) => (
+            <img key={i} src={image} alt="" width="600" height="600" />
           ))}
         </div>
       </div>

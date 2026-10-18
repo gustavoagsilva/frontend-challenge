@@ -163,6 +163,16 @@ test("início possui assets locais, sem overflow, e baseline visual", async ({
   page,
 }) => {
   await ready(page);
+  // Wait for the initial socket reconciliation before capturing the settled UI.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        async () =>
+          (await (await fetch("/api/__mock/status")).json()).connections,
+      ),
+    )
+    .toBeGreaterThan(0);
+  await expect(page.getByText(/Atualizando/)).toBeHidden();
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
@@ -187,6 +197,7 @@ test("início possui assets locais, sem overflow, e baseline visual", async ({
   await expect(page).toHaveScreenshot("inicio.png", {
     fullPage: true,
     animations: "disabled",
+    timeout: 15000,
   });
   await page.setViewportSize({ width: 768, height: 1024 });
   await expect(page).toHaveScreenshot("inicio-tablet.png", {

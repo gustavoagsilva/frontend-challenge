@@ -71,7 +71,7 @@ Os testes usam porta 4173 e banco isolado por contexto. Baselines estão em `tes
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): decisões de estado, sessão, compra, tempo real e ajustes visuais.
 - [API.md](API.md): contratos REST, eventos e respostas de erro.
-- Imagens SVG provisórias em `public/images/nfts`; referências centralizadas em `src/mocks/fixtures.ts`. Os NFTs originais ainda precisam ser substituídos.
+- As quatro artes originais exportadas do Figma estão em `public/images/nfts`; o mapeamento fica em `src/lib/nft-artwork.ts`. Edições diferentes reutilizam a mesma arte, como no layout. Origem e dimensões em [public/images/nfts/README.md](public/images/nfts/README.md).
 - Fontes e imagens são locais; não há dependência de serviços externos em execução.
 - Blockchain, pagamentos, autenticação e transações são simulados. O banco local não representa uma arquitetura de autenticação para produção.
 

@@ -1,5 +1,7 @@
 # Auditoria Lighthouse
 
+**Relatório histórico:** esta coleta precede a substituição das ilustrações SVG pelas quatro artes PNG originais do Figma. Os números abaixo não medem a versão atual das imagens; a auditoria deve ser repetida antes da entrega final.
+
 Medições locais em 18/10/2026, build de produção do commit a60630d, com os mesmos mocks e assets usados na demonstração. Três execuções por página e dispositivo, cada uma com perfil novo do Chromium. Os números abaixo são medianas independentes de cada métrica.
 
 | Página / dispositivo | Desempenho | Acessibilidade | Boas práticas | SEO | LCP (ms) |     CLS | TBT (ms) |
