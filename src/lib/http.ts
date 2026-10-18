@@ -20,7 +20,9 @@ http.interceptors.response.use(
   (error) => {
     if (
       error.response?.status === 401 &&
-      !error.config?.url?.startsWith("/session")
+      !error.config?.url?.startsWith("/session") &&
+      error.config?.headers?.Authorization ===
+        "Bearer " + localStorage.getItem("kurio:token")
     )
       window.dispatchEvent(new Event("kurio:session-expired"));
     return Promise.reject(error);

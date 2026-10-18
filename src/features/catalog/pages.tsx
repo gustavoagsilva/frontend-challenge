@@ -146,6 +146,16 @@ export function HomePage() {
   }
   function applyPrice(event: FormEvent) {
     event.preventDefault();
+    if (
+      [price.min, price.max].some(
+        (value) => value && !/^\d{1,6}(\.\d{1,18})?$/.test(value),
+      )
+    ) {
+      setPriceError(
+        "Use valores decimais, com até 18 casas, sem notação exponencial.",
+      );
+      return;
+    }
     if (price.min && price.max && ethUnits(price.min) > ethUnits(price.max)) {
       setPriceError("O preço mínimo deve ser menor ou igual ao máximo.");
       return;

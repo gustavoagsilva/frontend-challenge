@@ -53,6 +53,12 @@ test("preço é filtrado pela API e preço invertido recebe validação", async 
 }) => {
   await ready(page);
   const filters = await openFilters(page);
+  await filters.getByLabel("Preço mínimo em ETH").fill("1e1");
+  await filters.getByLabel("Preço máximo em ETH").fill("100");
+  await filters.getByRole("button", { name: "Aplicar preço" }).click();
+  await expect(filters.getByRole("alert")).toContainText(
+    "sem notação exponencial",
+  );
   await filters.getByLabel("Preço mínimo em ETH").fill("2");
   await filters.getByLabel("Preço máximo em ETH").fill("1");
   await filters.getByRole("button", { name: "Aplicar preço" }).click();

@@ -30,7 +30,7 @@ const root = createRootRoute({
     </main>
   ),
   errorComponent: ({ reset }) => (
-    <main className="container empty-state">
+    <main id="main-content" className="container empty-state">
       <h1>Não foi possível carregar esta página.</h1>
       <button onClick={reset}>Tentar novamente</button>
     </main>

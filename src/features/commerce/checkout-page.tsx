@@ -267,6 +267,11 @@ function Checkout({
       </div>
       {cart.isPending ? (
         <SummarySkeleton />
+      ) : cart.isError ? (
+        <div className="empty-state" role="alert">
+          <p>{apiError(cart.error).message}</p>
+          <Button onClick={() => cart.refetch()}>Tentar novamente</Button>
+        </div>
       ) : !cart.data?.items.length ? (
         <div className="empty-state">
           <h2>Adicione NFTs ao carrinho para continuar.</h2>

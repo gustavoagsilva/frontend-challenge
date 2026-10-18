@@ -63,6 +63,7 @@ test("pedido pendente recupera por refresh, confirma por evento e é privado", a
     page.getByRole("heading", { name: "Pedido em processamento" }),
   ).toBeVisible();
   const id = await page.getByTestId("order-id").innerText();
+  await action(page, { action: "disconnect" });
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Pedido em processamento" }),

@@ -13,6 +13,7 @@ export function Realtime() {
   useEffect(() => {
     if (session.isPending) return;
     let active = true;
+    let hasConnected = false;
     let disconnect: (() => void) | undefined;
     const versions = new Map<string, number>(),
       seen = new Set<string>();
@@ -84,7 +85,13 @@ export function Realtime() {
           void client.invalidateQueries({ queryKey: ["cart", userId] });
         }
       };
-      socket.on("connect", reconcile);
+      socket.on("connect", () => {
+        // Initial queries already fetch current data. Reconcile only after a
+        // disconnect, avoiding duplicate requests and a second loading flash.
+        if (hasConnected) reconcile();
+        else setOffline(false);
+        hasConnected = true;
+      });
       socket.on("disconnect", () => {
         if (active) setOffline(true);
       });

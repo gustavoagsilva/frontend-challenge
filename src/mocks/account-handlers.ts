@@ -296,7 +296,8 @@ export const accountHandlers = [
     }
   }),
   http.put("/api/favorites/:id", async ({ request, params }) => {
-    await network(request);
+    const failure = await network(request);
+    if (failure) return failure;
     try {
       const { favorite } = await body<{ favorite: boolean }>(request);
       return await transaction((db) => {

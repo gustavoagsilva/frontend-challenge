@@ -25,8 +25,13 @@ export function SessionEffects() {
     async function storage(event: StorageEvent) {
       if (event.key !== "kurio:token") return;
       await queryClient.cancelQueries();
-      queryClient.clear();
-      const next = await queryClient.fetchQuery(sessionQuery).catch(() => null);
+      // Preserve the session query's observers so mounted screens see the new user.
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== "session",
+      });
+      const next = await queryClient
+        .fetchQuery({ ...sessionQuery, staleTime: 0 })
+        .catch(() => null);
       if (!next) await expired();
       else window.dispatchEvent(new Event("kurio:session-changed"));
     }

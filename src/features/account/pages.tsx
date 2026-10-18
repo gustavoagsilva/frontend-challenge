@@ -66,7 +66,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
       (await http.patch<Profile>("/profile", values)).data,
     onSuccess: (user) =>
       client.setQueryData<Session>(["session"], (old) =>
-        old ? { ...old, user } : old,
+        old?.user.id === user.id ? { ...old, user } : old,
       ),
   });
   const changePassword = useMutation({
