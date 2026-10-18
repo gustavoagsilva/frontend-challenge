@@ -93,6 +93,12 @@ test("expiração preserva carrinho e rascunho e retorna após autenticação", 
   await reviewCheckout(page);
   await action(page, { action: "expire" });
   await expect(page).toHaveURL(/login/);
+  await expect(
+    page.getByRole("heading", { name: "Entrar na sua conta", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.locator("header").getByRole("button", { name: "Ana", exact: true }),
+  ).toHaveCount(0);
   await page.getByLabel("E-mail", { exact: true }).fill("ana@kurio.test");
   await page.getByLabel("Senha", { exact: true }).fill("Kurio123!");
   await page

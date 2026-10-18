@@ -15,7 +15,12 @@ export async function changeSession(session: Session | null) {
   await queryClient.cancelQueries();
   if (session) localStorage.setItem("kurio:token", session.token);
   else localStorage.removeItem("kurio:token");
-  queryClient.clear();
+  // Keep mounted session observers attached; clearing this query would leave
+  // the header and socket subscribed to the previous session until a remount.
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] !== "session",
+  });
+  queryClient.getMutationCache().clear();
   queryClient.setQueryData(["session"], session);
   window.dispatchEvent(new Event("kurio:session-changed"));
 }

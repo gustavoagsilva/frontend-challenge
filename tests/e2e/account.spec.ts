@@ -36,6 +36,9 @@ test("login, perfil, senha, logout e isolamento entre usuários", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Sair da conta" }).click();
   await expect(page).toHaveURL(/\/(\?.*)?$/);
+  await expect(
+    page.locator("header").getByRole("button", { name: "Entrar", exact: true }),
+  ).toBeVisible();
   await login(page, "bruno@kurio.test");
   await expect(page.getByLabel("Nome de usuário")).toHaveValue("Bruno Costa");
   await page.getByRole("button", { name: "Sair da conta" }).click();
