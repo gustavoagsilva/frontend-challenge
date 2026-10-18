@@ -6,8 +6,8 @@ export function Field({
 }: ComponentProps<"input"> & { label: string; error?: string }) {
   const id = useId();
   return (
-    <label className="form-field" htmlFor={id}>
-      <span>{label}</span>
+    <div className="form-field">
+      <label htmlFor={id}>{label}</label>
       <input
         id={id}
         aria-invalid={!!error}
@@ -19,7 +19,7 @@ export function Field({
           {error}
         </span>
       )}
-    </label>
+    </div>
   );
 }
 export function Message({

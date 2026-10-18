@@ -169,3 +169,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
     </main>
   );
 }
+
+export function RegisterPage() {
+  return <AuthPage register />;
+}

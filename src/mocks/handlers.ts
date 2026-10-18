@@ -1,4 +1,4 @@
-import { clearOrderTimers } from './commerce'
+import { clearOrderTimers } from "./commerce";
 import { connectionHandlers } from "./connection-handlers";
 import { http, HttpResponse, delay } from "msw";
 import {
@@ -101,7 +101,10 @@ export const handlers = [
       : HttpResponse.json({ message: "NFT não encontrado." }, { status: 404 });
   }),
   http.post("/api/__mock/reset", async () => {
-    clearOrderTimers(); await resetDatabase(); localStorage.removeItem('kurio:token'); localStorage.removeItem('kurio:guest');
+    clearOrderTimers();
+    await resetDatabase();
+    localStorage.removeItem("kurio:token");
+    localStorage.removeItem("kurio:guest");
     localStorage.removeItem("kurio:scenario");
     return HttpResponse.json({ reset: true });
   }),

@@ -8,7 +8,7 @@ import { http, apiError } from "@/lib/http";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Message } from "@/components/form";
-import { FavoriteButton } from "@/features/account/favorites";
+import { FavoriteButton } from "@/features/account/favorite-button";
 import { defaultSearch, formatEth } from "@/features/catalog/contracts";
 import { discoveryQuery } from "@/features/catalog/api";
 import { NftCard } from "@/features/catalog/pages";

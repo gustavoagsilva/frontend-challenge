@@ -62,11 +62,14 @@ async function seed(): Promise<Database> {
         email: "bruno@kurio.test",
         salt: "kurio-demo-bruno",
       },
-    ].map(async (user) => ({
+    ].map((user) => ({
       ...user,
       phone: "11999998888",
       avatar: "",
-      passwordHash: await passwordHash("Kurio123!", user.salt),
+      passwordHash:
+        user.id === "ana"
+          ? "b0bc10b60758577ca4b3e221a9b967cece6296b474823098dff1a8d9014fc668"
+          : "e68ba55e43176364481138b3395b1fb9f7bf237021a99a72dec8979d1d0d8d28",
     })),
   );
   const wallets = Object.fromEntries(

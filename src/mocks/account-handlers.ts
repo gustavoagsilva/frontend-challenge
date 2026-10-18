@@ -123,7 +123,10 @@ export const accountHandlers = [
   http.delete("/api/session", async ({ request }) => {
     await transaction((db) => {
       const token = tokenOf(request);
-      if (token) { delete db.sessions[token]; delete db.connections[token]; }
+      if (token) {
+        delete db.sessions[token];
+        delete db.connections[token];
+      }
     });
     return new HttpResponse(null, { status: 204 });
   }),

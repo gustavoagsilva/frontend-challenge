@@ -1,12 +1,16 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App'
+import "./index.css";
 async function bootstrap() {
-  if (import.meta.env.VITE_ENABLE_MOCKS !== 'false') {
-    const { worker } = await import('./mocks/browser')
-    await worker.start({ onUnhandledRequest: 'bypass' })
+  const render = import("./render");
+  if (import.meta.env.VITE_ENABLE_MOCKS !== "false") {
+    const { worker } = await import("./mocks/browser");
+    await worker.start({ quiet: true, onUnhandledRequest: "bypass" });
   }
-  createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>)
+  const { mountApp } = await render;
+  mountApp();
 }
-void bootstrap()
+void bootstrap().catch(() => {
+  const root = document.getElementById("root")!;
+  root.textContent =
+    "Não foi possível iniciar a aplicação. Atualize a página para tentar novamente.";
+  root.setAttribute("role", "alert");
+});

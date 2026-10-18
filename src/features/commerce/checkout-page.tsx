@@ -112,6 +112,8 @@ function Checkout({
   const validReview =
     !!review &&
     !!quote.data &&
+    !quote.isError &&
+    !quote.isFetching &&
     review.quote.fingerprint === quote.data.fingerprint &&
     review.data === dataSignature &&
     review.quote.expiresAt > now &&
