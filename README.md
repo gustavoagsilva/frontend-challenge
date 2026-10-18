@@ -1,57 +1,80 @@
-# Kurio — Frontend Challenge
+# Kurio — Marketplace de NFTs
 
-Implementação em andamento do desafio https://github.com/junglegaming/frontend-challenge.
-A etapa atual entrega Desktop / Início com catálogo integrado à API simulada, adaptação responsiva e navegação para um detalhe inicial. **O desafio completo ainda não está concluído.**
+Implementação do [desafio frontend da Jungle](https://github.com/junglegaming/frontend-challenge), com catálogo, conta do colecionador e compra simulada.
 
 ## Executar
 
-Node.js 24 e npm:
+Node.js 24 LTS e npm. No diretório do projeto:
 
-```powershell
+```sh
 npm ci
-Copy-Item .env.example .env.local
-npm run dev -- --host 127.0.0.1
+npx playwright install chromium
+npm run dev
 ```
 
-Abra o endereço informado pelo Vite e mantenha o terminal ativo.
-Se houver erro de certificado no Windows: `$env:NODE_USE_SYSTEM_CA='1'` antes do npm; não é necessário desativar TLS.
+Abra o endereço informado pelo Vite no terminal e mantenha o processo aberto. Não é necessário backend, extensão de carteira ou credencial privada.
 
-Variáveis: `VITE_API_URL=/api` e `VITE_ENABLE_MOCKS=true`. Os mocks também são incluídos no build de demonstração quando esta flag está ativa. Sem a flag, o cliente espera uma API REST nesse endereço; não existe fallback de dados na UI.
+Os padrões são `VITE_API_URL=/api` e mocks habilitados. Para sobrescrever, copie `.env.example` para `.env.local`. `VITE_ENABLE_MOCKS=false` desativa a simulação e exige um backend compatível. O build de demonstração também inclui MSW.
+
+## Contas fictícias
+
+| E-mail           | Senha     |
+| ---------------- | --------- |
+| ana@kurio.test   | Kurio123! |
+| bruno@kurio.test | Kurio123! |
+
+Cada conta começa com carteiras Ethereum e Polygon. O cadastro cria uma conta sem carteiras. Use o cupom **KURIO10** para 10% de desconto; **EXPIRED** representa cupom expirado. Senhas são verificadas por PBKDF2 e não ficam em claro no banco local.
+
+## Fluxo principal
+
+1. Explore o catálogo, combine filtros e abra um NFT.
+2. Escolha edição e quantidade; adicione ao carrinho.
+3. Ajuste quantidades ou cupom e selecione “Conectar e finalizar”.
+4. Entre, preencha os dados do colecionador, selecione carteira/rede e conecte.
+5. Revise e confirme. O pedido começa pendente e só mostra sucesso depois da confirmação da API.
+6. Consulte o recibo ou a lista em `/pedidos`.
+
+Login preserva o carrinho visitante. Perfil, avatar, favoritos, carteiras e pedidos persistem após refresh.
+
+## Cenários de demonstração
+
+Abra **/demonstracao**. O painel aplica cenários aos handlers MSW, atualiza preço/estoque por Socket.IO e restaura os dados iniciais. Para observar eventos enquanto está no checkout, abra o painel em outra aba da mesma origem.
+
+- **Preço muda ao confirmar:** revise uma compra, aplique o cenário e confirme. A API devolve conflito e exige nova revisão.
+- **Edição esgota ao confirmar:** a compra é bloqueada e o item permanece no carrinho.
+- **Timeout após criar pedido:** a resposta falha depois de salvar a compra. Atualize a página e use “Recuperar pedido”; a tentativa mantém sua chave de idempotência.
+- **Pagamento recusado:** aguarde o resultado; os itens permanecem no carrinho.
+- **Pedido pendente:** permanece pendente por 60 segundos. O painel também permite resolver pelo ID.
+- **Lentidão, vazio, offline e HTTP 503:** permitem verificar skeletons, estados vazios e recuperação. Volte ao cenário Sucesso e tente novamente.
+- **Sessão expirada:** também há um botão para expirar imediatamente a sessão. Autentique novamente para retomar a rota anterior.
+- **Eventos repetidos:** não devem regredir preço/estoque. “Interromper socket” atua na aba do painel; os testes também interrompem a conexão diretamente na tela do pedido.
+
+A restauração remove alterações e sessões fictícias desta origem. Dados de navegadores ou dispositivos diferentes são independentes.
 
 ## Comandos
 
-- `npm run dev`: desenvolvimento.
-- `npm run build`: TypeScript e build de produção.
-- `npm run preview -- --host 127.0.0.1`: testar build local.
-- `npm run typecheck` e `npm run lint`: validações.
-- `npx playwright install chromium`: instalar navegador de teste.
-- `npm run test:e2e`: fluxos de início e regressão visual, em Chromium desktop/mobile.
-- `npx playwright show-report`: relatório HTML; falhas têm traces.
-- `npm run test:e2e -- --update-snapshots`: atualizar baselines após revisão visual.
-- `npm run audit:lighthouse`: configuração inicial de Lighthouse CI (auditoria final do desafio ainda pendente).
+| Comando                            | Uso                                  |
+| ---------------------------------- | ------------------------------------ |
+| `npm run dev` / `npm run dev:mock` | Desenvolvimento com mocks por padrão |
+| `npm run build`                    | Tipos e build otimizado              |
+| `npm run preview`                  | Servir o build local                 |
+| `npm run typecheck`                | TypeScript                           |
+| `npm run lint`                     | Oxlint                               |
+| `npm run test:e2e`                 | Chromium desktop e mobile            |
+| `npm run test:report`              | Abrir relatório HTML do Playwright   |
+| `npm run audit:lighthouse`         | Build e 12 medições do Lighthouse    |
+| `npm run format`                   | Formatar fontes e testes             |
 
-## Imagens provisórias
+Os testes usam porta 4173 e banco isolado por contexto. Baselines estão em `tests/e2e/*-snapshots`; foram geradas no Windows com Chromium. O relatório HTML fica em `playwright-report`, com traces retidos quando há falha. As auditorias ficam em `reports/lighthouse`. Consulte [TESTING.md](TESTING.md) e [LIGHTHOUSE.md](LIGHTHOUSE.md).
 
-Os SVGs locais estão em `public/images/nfts/`. Para trocar pelos NFTs definitivos, salve os novos arquivos nessa pasta e atualize `image` nas fixtures em `src/mocks/fixtures.ts`.
-As imagens são dados da API, reutilizados automaticamente no restante da página. A fonte IBM Plex Mono também é local e provisória.
+## Organização e limites
 
-## Cenários reproduzíveis
+- [ARCHITECTURE.md](ARCHITECTURE.md): decisões de estado, sessão, compra, tempo real e ajustes visuais.
+- [API.md](API.md): contratos REST, eventos e respostas de erro.
+- Imagens SVG provisórias em `public/images/nfts`; referências centralizadas em `src/mocks/fixtures.ts`. Os NFTs originais ainda precisam ser substituídos.
+- Fontes e imagens são locais; não há dependência de serviços externos em execução.
+- Blockchain, pagamentos, autenticação e transações são simulados. O banco local não representa uma arquitetura de autenticação para produção.
 
-No console do navegador, escolha um cenário e recarregue:
+## Publicação
 
-```js
-localStorage.setItem('kurio:scenario', 'slow')
-location.reload()
-```
-
-Opções: `success` (180ms), `empty`, `slow` (2500ms), `error` (503), `offline` (falha de rede) e `out-of-order` (buscas curtas: 1500ms; longas: 100ms).
-
-Para testar recuperação, mude o cenário para `success` sem recarregar e use **Tentar novamente**. Para resetar: remova `kurio:scenario` e recarregue. O endpoint POST /api/__mock/reset também limpa esse cenário. Os dados de catálogo são determinísticos e somente leitura.
-
-Os testes usam contextos isolados e o MSW real no navegador, sem interceptações Playwright que substituam os handlers. As imagens e fontes são locais. Baselines desta etapa ficam em tests/e2e/catalog.spec.ts-snapshots (Windows). Não existem credenciais nesta etapa porque a autenticação ainda não foi implementada.
-
-## Pendências
-
-Consulte ARCHITECTURE.md para contratos, cache, decisões visuais e escopo. Conta, carrinho, compra, tempo real, demais testes e deploy continuam pendentes.
-
-A auditoria npm inicial apontou 17 alertas transitivos nas ferramentas de desenvolvimento associadas ao Lighthouse CI. A correção automática sem alterações incompatíveis não resolveu esses alertas; revisar na etapa de auditorias. Dependências de produção não apresentaram alertas na verificação inicial.
+O projeto está preparado para Vercel com `vercel.json` (Vite, saída `dist`, fallback de rotas e service worker sem cache). **A publicação ainda não foi realizada.** Configure `VITE_ENABLE_MOCKS=true` e `VITE_API_URL=/api`, confira acesso direto a `/nfts/kurio-001` e autenticação em `/pagamento`, e valide os eventos na URL pública antes da entrega.

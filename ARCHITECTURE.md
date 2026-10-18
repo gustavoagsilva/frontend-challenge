@@ -1,36 +1,57 @@
-# Arquitetura e escopo atual
+# Decisões de implementação
 
-## Desktop / Início
+## Organização
 
-Implementado: destaque selecionável, catálogo, busca enviada por formulário, coleção + rede + faixa de preço combináveis, abas, ordenação e paginação. Todos os parâmetros são validados pelo TanStack Router e preservados na URL, inclusive no refresh e histórico. Uma mudança de filtro volta à página 1. Páginas acima do limite retornam a última página e a URL é normalizada.
+React e TypeScript, Vite, TanStack Router/Query, Axios, Tailwind e componentes no padrão shadcn/ui. A pasta `features` reúne catálogo, conta e comércio. `domain` contém contratos e aritmética; `mocks` implementa o backend da demonstração. As telas privadas são carregadas sob demanda.
 
-React renderiza dados obtidos por TanStack Query → Axios → MSW. Fixtures e filtros de negócio ficam exclusivamente nos handlers de rede. Consultas de catálogo incluem todos os parâmetros na chave de cache e recebem AbortSignal. Dados públicos ficam frescos por 30s, são coletados após 5min sem uso e revalidados ao focar a janela. Erros de rede/5xx têm uma tentativa adicional; 4xx não são repetidos. Estados pendente, vazio, erro, sucesso e atualização em segundo plano têm feedback próprio.
+As telas não leem fixtures nem o banco dos mocks. As operações de negócio usam Axios, inclusive durante testes. O cliente carrega React e MSW em paralelo, aguardando a interceptação antes de iniciar consultas.
 
-ETH trafega como string decimal. Comparação e ordenação usam inteiros de 18 casas (BigInt), sem conversão monetária para ponto flutuante. A apresentação preserva a precisão recebida. O catálogo desta etapa é somente leitura: fixtures determinísticas sobrevivem ao refresh por reconstrução. A persistência de conta/carrinho/pedidos será implementada junto às respectivas mutations.
+## Estado e cache
 
-## Interface e assets
+Busca, coleção, rede, preço, ordenação, categoria e página pertencem à URL. A chave de catálogo inclui todos esses parâmetros. Consultas recebem AbortSignal do TanStack Query para cancelar requisições obsoletas.
 
-Composição baseada nas capturas fornecidas: desktop 1440px, container 1200px, fundo #140D0A, destaques em cobre, sidebar, grade de três colunas, banners, diário e rodapé. Mobile usa duas colunas e diálogo de filtros; tablet mantém a sidebar. Testes conferem larguras 390, 768 e 1440px.
+Dados públicos usam chaves `catalog`, `discovery`, `nft/id`. Dados privados usam `private/userId/recurso`; carrinho e cotação incluem o proprietário. O padrão é staleTime de 30 segundos, gcTime de cinco minutos e uma repetição para falhas transitórias. Erros 4xx e mutations não são repetidos automaticamente. A sessão é consultada a cada 15 segundos; o cliente também agenda a expiração exata.
 
-As seis imagens em `public/images/nfts/sample-*.svg` são ilustrações vetoriais provisórias feitas para este protótipo, autorizadas pelo usuário. **Não são os assets originais do Figma.** Substituir o campo `image` em `src/mocks/fixtures.ts` pelos arquivos definitivos. A mesma imagem é reutilizada em destaque, cards, banners e detalhe, sem URLs externas.
+Favoritos usam atualização otimista, snapshot anterior e rollback. Logout/troca de conta cancelam consultas, limpam cache e encerram o socket anterior. Alterações de token em outra aba também limpam o cache. Redirecionamentos de retorno aceitam apenas caminhos internos.
 
-IBM Plex Mono é uma aproximação provisória, distribuída localmente por @fontsource (licença OFL incluída no pacote). Tipografia, microespaçamentos, textos pequenos e algumas cores precisam ser conferidos na exportação legível/Figma. O layout não foi validado pixel a pixel contra o arquivo original.
+## Persistência e simulação
 
-Button segue o padrão shadcn/ui Radix (Slot + CVA), adaptado ao tema em Tailwind; Skeleton é um componente compartilhado com shimmer e suporte a movimento reduzido. Diálogos nativos têm identificação, bloqueio do fundo, contenção explícita de foco, fechamento por Escape e restauração do foco. Há skip link, foco visível, labels e anúncios de resultado. Ações indisponíveis abrem aviso sem produzir efeitos falsos.
+O MSW intercepta REST e WebSocket. O banco `kurio:database:v2` vive no localStorage, com transações serializadas por Web Locks. Inclui 36 NFTs, edições, dois usuários, carteiras, carrinhos, cotações, pedidos e tentativas.
 
-## Limites desta etapa
+Senhas usam PBKDF2/SHA-256 com 100.000 iterações e salt. Os hashes iniciais das contas fictícias são pré-calculados; cadastro e alteração de senha usam Web Crypto. O token simulado expira em uma hora. A autenticação local é exclusivamente parte do exercício.
 
-O detalhe é uma visualização inicial dos dados reais da API simulada, acessível por URL, com 404 e esgotamento. Não representa a conclusão da tela de detalhes do desafio.
+Carrinhos visitantes têm UUID próprio. O login mescla itens por NFT/edição, limita pela disponibilidade e consome o carrinho visitante uma vez. Rascunho e tentativa de checkout usam sessionStorage por usuário; não guardam senha. Reiniciar o cenário limpa o banco, timers, token e rascunhos pela interface de demonstração.
 
-Pendentes: autenticação e dois usuários, favoritos e mutation otimista com rollback, carrinho persistente, checkout/cotações, idempotência de pedidos, perfil, carteiras, Socket.IO/MSW com versões/reconexão, demais cenários e testes do desafio, auditorias Lighthouse completas e deploy. Nenhuma compra, assinatura de newsletter ou login aparenta sucesso nesta etapa. Conteúdo editorial permanece auxiliar, sem novas páginas.
+## Cotação e pedido
 
-## Contratos implementados
+ETH trafega como string decimal. Cálculos usam BigInt em unidades de 10⁻¹⁸; quantidades são inteiras. O desconto de 10% arredonda para baixo na menor unidade e a taxa simulada é 0.016 ETH.
 
-| Método e rota | Entrada | Resposta |
-| --- | --- | --- |
-| GET /api/nfts | q, collection, network, min, max, sort, tab, page | items, total, page, pages, pageSize (9) |
-| GET /api/discovery | — | featured (3 NFTs), collections (name, count) |
-| GET /api/nfts/:id | ID estável | NFT ou 404 com message |
-| POST /api/__mock/reset | — | { reset: true }; limpa cenário de falha |
+A cotação registra linhas, versões, preços, estoque, cupom, taxas e expiração de dois minutos. A revisão fica inválida se a cotação falhar, estiver atualizando, expirar ou os dados mudarem. O servidor revalida o fingerprint antes de reservar estoque.
 
-NFT: id, name, image, collection, network, price (string ETH), edition, available (inteiro), badge, createdAt (ISO), popularity e version. Tipos em `src/features/catalog/contracts.ts`. REST ainda não inclui recursos de conta/compra. Não há eventos de tempo real implementados nesta etapa.
+Cada tentativa persiste uma chave de idempotência antes do envio. A API guarda chave, conteúdo e pedido por usuário: mesma chave/conteúdo recupera o pedido; conteúdo diferente gera 409. Cliques repetidos são bloqueados também por uma trava síncrona. Timeout após criação não apaga a tentativa.
+
+Pedidos começam pendentes. A simulação confirma ou recusa depois do prazo; refresh e consultas retomam a resolução, inclusive sem o timer anterior. Estados terminais não mudam. Confirmação remove apenas as quantidades compradas; recusa libera a reserva e mantém o carrinho. O recibo usa o snapshot, nunca os preços atuais do catálogo.
+
+## Tempo real
+
+O cliente usa socket.io-client com transporte WebSocket e reconexão. MSW + @mswjs/socket.io-binding realizam handshake e codificação Engine.IO/Socket.IO. Há heartbeat de dez segundos. MSW normaliza o prefixo /socket.io/ ao comparar o endpoint.
+
+Os mocks publicam eventos após alterações. BroadcastChannel distribui os eventos entre abas da mesma origem; cada conexão recebe pedidos somente do usuário autenticado. O cliente valida usuário, ID e versão, descarta duplicatas/versões antigas e invalida os recursos afetados para buscar o estado REST.
+
+Reconexão reconcilia recursos ativos. Pedidos pendentes também têm consulta de recuperação a cada 1,5 segundo. Listeners, heartbeat e conexão são liberados ao desmontar ou trocar sessão.
+
+Não há servidor Socket.IO externo nem fallback de long polling. Os eventos simulados só existem no navegador; não sincronizam computadores diferentes. A consulta REST restaura o estado persistido se a aba foi fechada.
+
+## Visual e acessibilidade
+
+Implementação baseada nos prints recebidos. Fundo #140d0a, tons cobre, fonte IBM Plex Mono local e imagens SVG provisórias. A fonte e as ilustrações são substituições documentadas; não foi possível conferir todas as medidas e assets originais diretamente no arquivo Figma.
+
+Desktop mantém catálogo com sidebar, hero, cards, promoções e rodapé. Mobile reorganiza filtros em diálogo, usa navegação inferior no catálogo e telas de compra sem rodapé. Detalhe mobile mantém a seleção de galeria em miniaturas sobre a imagem. Checkout apresenta dados obrigatórios em rolagem, mesmo quando não aparecem integralmente no frame mobile.
+
+Campos têm labels e erros associados; estados usam texto além de cor. Diálogos prendem foco e fecham com Escape. Skeletons respeitam movimento reduzido. Quantidades, conexão, mutations e alterações de preço fornecem feedback. A rota de autenticação tem painel sobre o fundo no desktop e formulário independente no mobile.
+
+Conteúdo editorial, redes sociais, recuperação de senha e login social não integram o fluxo exigido; ações auxiliares disponíveis informam sua indisponibilidade, sem fingir conclusão. A fidelidade final depende da troca das imagens provisórias e da revisão com os assets originais.
+
+## Próximos cuidados
+
+Publicar na Vercel somente após revisão do responsável; confirmar rotas e service worker na URL final. Substituir imagens e repetir baselines/auditorias. Os resultados de Lighthouse, inclusive valores abaixo da meta, estão registrados separadamente; não há caminho especial de renderização para auditoria.

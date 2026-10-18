@@ -9,8 +9,11 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
-    "test:e2e": "playwright test",
-    "audit:lighthouse": "npm run build && lhci autorun"
+    "test:e2e": "playwright test --workers=1",
+    "audit:lighthouse": "npm run build && node scripts/audit.mjs",
+    "dev:mock": "vite",
+    "test:report": "playwright show-report",
+    "format": "prettier --write src tests scripts *.json *.ts *.md index.html"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
