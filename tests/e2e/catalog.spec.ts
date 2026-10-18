@@ -189,6 +189,10 @@ test("início possui assets locais, sem overflow, e baseline visual", async ({
     animations: "disabled",
   });
   await page.setViewportSize({ width: 768, height: 1024 });
+  await expect(page).toHaveScreenshot("inicio-tablet.png", {
+    fullPage: true,
+    animations: "disabled",
+  });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

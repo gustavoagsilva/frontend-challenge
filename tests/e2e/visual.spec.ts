@@ -24,6 +24,11 @@ async function visual(page: Page, name: string) {
   });
   const original = page.viewportSize()!;
   await page.setViewportSize({ width: 768, height: 1024 });
+  await assets(page);
+  await expect(page).toHaveScreenshot("tablet-" + name, {
+    fullPage: true,
+    animations: "disabled",
+  });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
