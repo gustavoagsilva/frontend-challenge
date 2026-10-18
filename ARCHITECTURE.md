@@ -52,6 +52,10 @@ Campos têm labels e erros associados; estados usam texto além de cor. Diálogo
 
 Conteúdo editorial, redes sociais, recuperação de senha e login social não integram o fluxo exigido; ações auxiliares disponíveis informam sua indisponibilidade, sem fingir conclusão. As imagens já correspondem às quatro artes dos prints; medidas, tipografia e composição ainda podem ser refinadas na revisão visual.
 
-## Próximos cuidados
+## Verificação da entrega
 
-Publicar na Vercel somente após revisão do responsável; confirmar rotas e service worker na URL final. Repetir auditorias na versão com as artes originais. Os resultados anteriores de Lighthouse, inclusive valores abaixo da meta, estão registrados separadamente; não há caminho especial de renderização para auditoria.
+O projeto está publicado na Vercel. A revisão final inclui execução na URL pública, checkout limpo e novas medições com as artes originais. As evidências e limitações estão em TESTING.md, LIGHTHOUSE.md e docs/artifacts. Não há caminho especial de renderização para auditoria.
+
+Login, logout e expiração preservam os observadores da consulta de sessão, notificando imediatamente cabeçalho e socket. A troca de token entre abas cancela consultas e remove dados privados, preservando os observadores da consulta de sessão para que a tela montada receba o novo usuário. Respostas atrasadas de atualização de perfil só atualizam a sessão se o usuário ainda corresponder ao autor da operação. Um 401 de uma sessão antiga não encerra uma sessão nova.
+
+O catálogo mobile usa uma grade regular, em vez do escalonamento dos cards do print; o banner, os controles de filtro e os formulários têm adaptações de composição e tamanho para manter os fluxos completos. As baselines protegem a implementação contra regressões; não são uma comparação pixel a pixel com o Figma. A fonte IBM Plex Mono continua sendo uma aproximação documentada.

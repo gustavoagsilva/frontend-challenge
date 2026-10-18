@@ -2,6 +2,10 @@
 
 Implementação do [desafio frontend da Jungle](https://github.com/junglegaming/frontend-challenge), com catálogo, conta do colecionador e compra simulada.
 
+**Aplicação:** https://kurio-marketplace-ten.vercel.app/
+
+**Repositório:** https://github.com/gustavoagsilva/frontend-challenge
+
 ## Executar
 
 Node.js 24 LTS e npm. No diretório do projeto:
@@ -71,10 +75,13 @@ Os testes usam porta 4173 e banco isolado por contexto. Baselines estão em `tes
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): decisões de estado, sessão, compra, tempo real e ajustes visuais.
 - [API.md](API.md): contratos REST, eventos e respostas de erro.
+- [REVIEW.md](REVIEW.md): matriz de conferência dos requisitos e limites da entrega.
 - As quatro artes originais exportadas do Figma estão em `public/images/nfts`; o mapeamento fica em `src/lib/nft-artwork.ts`. Edições diferentes reutilizam a mesma arte, como no layout. Origem e dimensões em [public/images/nfts/README.md](public/images/nfts/README.md).
 - Fontes e imagens são locais; não há dependência de serviços externos em execução.
 - Blockchain, pagamentos, autenticação e transações são simulados. O banco local não representa uma arquitetura de autenticação para produção.
 
 ## Publicação
 
-O projeto está preparado para Vercel com `vercel.json` (Vite, saída `dist`, fallback de rotas e service worker sem cache). **A publicação ainda não foi realizada.** Configure `VITE_ENABLE_MOCKS=true` e `VITE_API_URL=/api`, confira acesso direto a `/nfts/kurio-001` e autenticação em `/pagamento`, e valide os eventos na URL pública antes da entrega.
+Publicado na Vercel com `vercel.json` (Vite, saída `dist`, fallback de rotas e service worker sem cache). Configuração: instalação `npm ci`, build `npm run build`, `VITE_ENABLE_MOCKS=true` e `VITE_API_URL=/api`. A branch `main` está integrada ao deploy automático.
+
+Para executar os mesmos testes contra o site publicado, defina `PLAYWRIGHT_BASE_URL=https://kurio-marketplace-ten.vercel.app` antes de `npm run test:e2e`. Os testes usam contextos isolados e alteram somente o banco simulado desses contextos. Para auditar o site com Lighthouse, defina `AUDIT_URL` com a mesma origem.
